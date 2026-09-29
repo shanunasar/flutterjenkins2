@@ -40,10 +40,10 @@ pipeline {
             }
         }
 
-        stage('Build APK') {
+        stage('Build Web') {
             steps {
                 dir('flutter_application_1') {
-                    bat 'flutter build apk --release'
+                    bat 'flutter build web --release'
                 }
             }
         }
@@ -51,15 +51,15 @@ pipeline {
 
     post {
         success {
-            echo 'Flutter CI/CD pipeline completed successfully!'
+            echo 'Flutter Web CI/CD pipeline completed successfully!'
         }
 
         failure {
-            echo 'Flutter CI/CD pipeline failed!'
+            echo 'Flutter Web CI/CD pipeline failed!'
         }
 
         always {
-            archiveArtifacts artifacts: 'flutter_application_1\\build\\app\\outputs\\flutter-apk\\app-release.apk',
+            archiveArtifacts artifacts: 'flutter_application_1\\build\\web\\**',
                              allowEmptyArchive: true
         }
     }
