@@ -1,32 +1,66 @@
 pipeline {
     agent any
 
+    environment {
+        FLUTTER_HOME = 'C:\\src\\flutter'
+        PATH = "${FLUTTER_HOME}\\bin;${env.PATH}"
+    }
+
     stages {
+
+        stage('Flutter Version') {
+            steps {
+                dir('flutter_application_1') {
+                    bat 'flutter --version'
+                }
+            }
+        }
 
         stage('Install Dependencies') {
             steps {
-                bat 'git config --global --add safe.directory C:/src/flutter'
-                bat 'flutter pub get'
+                dir('flutter_application_1') {
+                    bat 'flutter pub get'
+                }
+            }
+        }
+
+        stage('Analyze') {
+            steps {
+                dir('flutter_application_1') {
+                    bat 'flutter analyze'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                bat 'flutter test'
+                dir('flutter_application_1') {
+                    bat 'flutter test'
+                }
             }
         }
 
-        stage('Build') {
+        stage('Build APK') {
             steps {
-                bat 'flutter build web'
+                dir('flutter_application_1') {
+                    bat 'flutter build apk --release'
+                }
             }
         }
+    }
 
-        stage('Archive Web Build') {
-            steps {
-                archiveArtifacts artifacts: 'build\\web\\**',
-                                 fingerprint: true
-            }
+    post {
+        success {
+            echo 'Flutter CI/CD pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'Flutter CI/CD pipeline failed!'
+        }
+
+        always {
+            archiveArtifacts artifacts: 'flutter_application_1\\build\\app\\outputs\\flutter-apk\\app-release.apk',
+                             allowEmptyArchive: true
         }
     }
 }
